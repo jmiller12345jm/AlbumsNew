@@ -887,7 +887,15 @@ flex: 1;                /* This pushes the text to take up all remaining space *
 }
 
 .comments:hover{color:gold}
+.distribution-container {
+    position: relative;
+    z-index: 10; /* Bring it above the background glows */
+    pointer-events: auto !important;
+}
 
+.dist-svg, .dist-path, .click-hint {
+    pointer-events: none; /* This forces the click to pass through to the container */
+}
 
 
 
@@ -1597,11 +1605,7 @@ color:red}
     width: 100%;
     overflow-x: hidden;
   }
-  .card-content {
-    flex-direction: column; /* Stacks everything vertically */
-    text-align: center;
-  }
-  
+ 
   .card img {
     width: 200px;
     height: 200px;
@@ -1644,9 +1648,7 @@ margin-top:0px;
     font-weight: bold;}
 .aveNamesL{ display:none}
   /* 1. Art stays at top */
-  .artandedit {
-    order: 1;
-  }
+ 
 
   /* 2. Titles come second */
   .titles {
@@ -1661,39 +1663,32 @@ margin-top:0px;
     flex: none !important;              /* Prevents uneven stretching */
   }
 
-  .comments {
-    flex:1;
-    margin-top:0pt;
-  
-   letter-spacing: 1px;}
+ 
 
   .titles h3, .titles h4 {
     text-align: center !important;
     width: 100% !important;
     margin: 5px 0 !important;
     display: block !important;
+    font-size:15pt;
   }
  
 
   /* 3. Average Score jumps here (Under Titles) */
   .ave {
-    order: 3;
     margin: 0 auto 20px auto !important; /* Centers it and adds space below */
     flex: none !important;
   }
 
   /* 4. Chart goes to the bottom */
   .chartupdate {
-    order: 4;
     width: 100%;
   }
 
-  .bar-chart {
-    margin: 0 auto !important;
-  }
+
 
   .artandedit {
-    order: 1;
+   
   }
 
 .topofscreen {
@@ -1881,4 +1876,26 @@ margin-top:0px;
         align-items: flex-end;
         padding:inherit;
     }
+  
+  .graphandupdate {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0pt;
+    align-items: center;
+    width: 100%;
+    margin-right:0pt;
+    margin-bottom:10pt;
+}
+  
+  .distribution-container
+ {
+    width: 100%;
+    max-width: 350px;
+    height: 162px;
+   margin-bottom:15pt;
+    cursor: pointer;
+}
+  
+  .comments {color:#333}
 }}
