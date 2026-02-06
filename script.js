@@ -806,7 +806,7 @@ function createForm() {
       <form id="reviewForm" class="popup-form">
         <input type="text" name="Artist" placeholder="Artist" required>
         <input type="text" name="Album" placeholder="Album" required>
-        <input list="chooserList" name="Chooser" id="categoryDropdown" placeholder="Search Category..." required>
+        <input list="chooserList" name="Chooser" id="categoryDropdown" placeholder="User" required>
 <datalist id="chooserList"></datalist>
         <button type="submit" id="submitBtn">Submit</button>
       </form>
