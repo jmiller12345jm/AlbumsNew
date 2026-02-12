@@ -349,6 +349,8 @@ const logHeaders = Object.keys(logData[0]); // These are your "Paddy" or "Timest
     const aveCard = document.createElement('div');
     aveCard.className = 'aveCard';
     aveCard.style.background = color;
+    aveCard.style.cursor = 'pointer';
+    aveCard.onclick = () => showUserDetail(key, mean, stdDev);
     aveCard.innerHTML = `
       <p class="aveNamesL">${key.substring(0,8)}</p>
       <p class="aveNamesS">${key.substring(0,3)}</p>
@@ -1265,3 +1267,87 @@ document.getElementById('sortSelect').addEventListener('blur', function(e) {
     e.target.value = currentSort;
   }
 });
+
+
+function showUserDetail(userName, mean, stdDev) {
+    const details = globalData
+        .filter(a => a[userName] !== undefined && a[userName] !== "" && a[userName] !== null)
+        .map(a => {
+            let rawScore = parseFloat(a[userName]);
+            
+            // Mirroring your math: Normalize to 100-point scale
+            let valForColor = rawScore;
+            if (valForColor > 0 && valForColor <= 10) valForColor *= 10;
+
+            // Mirroring your zScore math
+            const zScore = stdDev > 0 ? (valForColor - mean) / stdDev : 0;
+            const colorValue = Math.max(0, Math.min(100, COLOR_ANCHOR + (zScore * COLOR_SENSITIVITY)));
+            const scoreColor = getBarColor(colorValue);
+
+            return {
+                artist: a.Artist || "Unknown",
+                album: a.Album || "Unknown",
+                score: rawScore,
+                bg: scoreColor
+            };
+        })
+        .sort((a, b) => b.score - a.score);
+
+    if (details.length === 0) return;
+
+    let listHtml = details.map(item => `
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #444;">
+            <div style="text-align: left; padding-right: 10px;">
+                <span style="font-weight: bold; display: block; color: #eee;">${item.album}</span>
+                <span style="font-size: 0.85em; color: #aaa;">${item.artist}</span>
+            </div>
+            <div style="
+                font-weight: bold; 
+                color: #fff; 
+                background: ${item.bg}; 
+                padding: 4px 6px; 
+                border-radius: 6px; 
+                min-width: 25px; 
+                text-align: center;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            ">
+                ${item.score}
+            </div>
+        </div>
+    `).join('');
+
+    showGenericModal(`${userName}'s Ratings`, listHtml);
+}
+
+
+function showGenericModal(title, content) {
+  // Create overlay
+  const overlay = document.createElement('div');
+  overlay.id = "userStatsModal";
+  overlay.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px;";
+  
+  // Close if background clicked
+  overlay.onclick = (e) => { if(e.target === overlay) overlay.remove(); };
+
+  // Create content box
+  const modal = document.createElement('div');
+  modal.style = "background:rgba(0, 0, 0, 0.65); width:100%; max-width:400px; max-height:80vh; border-radius:12px; display:flex; flex-direction:column; box-shadow: 0 10px 25px rgba(0,0,0,0.5); overflow:hidden;";
+  
+  modal.innerHTML = `
+    <div style="padding: 15px 20px; background: rgba(0, 0, 0, 0.85); border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+      <h6 style="margin: 0; font-size: 1.1em; color: #fff; text-align: center; width: 100%;">
+  ${title}
+</h6>
+      <button onclick="document.getElementById('userStatsModal').remove()" style="background:none; border:none; font-size:24px; cursor:pointer; color:#aaa;"></button>
+    </div>
+    <div style="padding: 0 20px; overflow-y: auto; flex-grow: 1;">
+      ${content}
+    </div>
+    <div style="padding: 15px; text-align: center;">
+      <button onclick="document.getElementById('userStatsModal').remove()" style="width:100%; padding:10px; border:none; border-radius:6px; background:#222; color:white; font-weight:bold; cursor:pointer;">Close</button>
+    </div>
+  `;
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+}
